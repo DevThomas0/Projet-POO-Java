@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ConnexionBD {
-    private static final String URL = "jdbc:mysql://localhost:3306/restaurantbella";
+    private static final String URL = "jdbc:mysql://localhost:33065/restaurantbella";
     private static final String USER = "root";
     private static final String PASSWORD = "root";
 
