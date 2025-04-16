@@ -214,6 +214,14 @@ public class AppRestaurant {
         }
         
         commande.afficherCommande();
+
+         if (bd.connecter()) {
+            bd.sauvegarderCommande(commande);
+            bd.deconnecter();
+            System.out.println("Commande sauvegardée avec succès!");
+        } else {
+            System.out.println("Impossible de sauvegarder la commande dans la base de données!");
+        }
     }
     
     private static void ajouterIngredients() {

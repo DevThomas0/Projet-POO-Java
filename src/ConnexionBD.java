@@ -66,6 +66,20 @@ public class ConnexionBD {
                     "prenom VARCHAR(100) NOT NULL, " +
                     "poste VARCHAR(50) NOT NULL)");
 
+            stmt.execute("CREATE TABLE IF NOT EXISTS commandes (" +
+                    "id INT AUTO_INCREMENT PRIMARY KEY, " +
+                    "date_commande TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
+                    "etat VARCHAR(50) NOT NULL, " +
+                    "total DOUBLE NOT NULL)");
+
+            stmt.execute("CREATE TABLE IF NOT EXISTS details_commandes (" +
+                    "id INT AUTO_INCREMENT PRIMARY KEY, " +
+                    "commande_id INT NOT NULL, " +
+                    "plat_nom VARCHAR(100) NOT NULL, " +
+                    "quantite INT NOT NULL, " +
+                    "FOREIGN KEY (commande_id) REFERENCES commandes(id) ON DELETE CASCADE, " +
+                    "FOREIGN KEY (plat_nom) REFERENCES plats(nom) ON DELETE CASCADE)");
+
             stmt.close();
             System.out.println("Tables créées avec succès!");
         } catch (SQLException e) {
