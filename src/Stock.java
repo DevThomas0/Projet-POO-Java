@@ -73,7 +73,8 @@ public class Stock {
             System.out.println(nomsIngredients.get(i) + " : " + quantitesIngredients.get(i) + " unités");
         }
     }
-    
+
+
     public List<String> getNomsIngredients() {
         return nomsIngredients;
     }

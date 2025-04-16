@@ -65,18 +65,27 @@ public class AppRestaurant {
         menu.ajouterP(tiramisu);
         menu.ajouterP(coca);
         
-        stock.ajouterIngredient("Farine", 1000);
+        stock.ajouterIngredient("Farine", 0);
+        bd.mettreAJourIngredient("Farine", 0);
         stock.ajouterIngredient("Tomate", 0);
         bd.mettreAJourIngredient("Tomate", 0);
-        stock.ajouterIngredient("Mozzarella", 300);
-        stock.ajouterIngredient("Oeufs", 50);
-        stock.ajouterIngredient("Pancetta", 200);
-        stock.ajouterIngredient("Parmesan", 250);
-        stock.ajouterIngredient("Mascarpone", 300);
-        stock.ajouterIngredient("Café", 100);
-        stock.ajouterIngredient("Cacao", 150);
-        stock.ajouterIngredient("Pâtes", 500);
-        
+        stock.ajouterIngredient("Mozzarella", 0);
+        bd.mettreAJourIngredient("Mozarella", 0);
+        stock.ajouterIngredient("Oeufs", 0);
+        bd.mettreAJourIngredient("Oeufs", 0);
+        stock.ajouterIngredient("Pancetta", 0);
+        bd.mettreAJourIngredient("Pancetta", 0);
+        stock.ajouterIngredient("Parmesan", 0);
+        bd.mettreAJourIngredient("Parmesan", 0);
+        stock.ajouterIngredient("Mascarpone", 0);
+        bd.mettreAJourIngredient("Mascarpone", 0);
+        stock.ajouterIngredient("Café", 0);
+        bd.mettreAJourIngredient("Café", 0);
+        stock.ajouterIngredient("Cacao", 0);
+        bd.mettreAJourIngredient("Cacao", 0);
+        stock.ajouterIngredient("Pâtes", 0);
+        bd.mettreAJourIngredient("Pâtes", 0);
+
         List<String> ingredientsMargherita = new ArrayList<>();
         ingredientsMargherita.add("Farine");
         ingredientsMargherita.add("Tomate");
@@ -241,7 +250,6 @@ public class AppRestaurant {
         }
     }
 
-
     private static void afficherCommandes() {
         if (bd.connecter()) {
             List<Commande> commandes = bd.chargerCommandes();
@@ -257,7 +265,12 @@ public class AppRestaurant {
     private static void ajouterIngredients() {
         System.out.println("\n----- Ajout d'ingrédients au stock -----");
         System.out.print("Nom de l'ingrédient: ");
-        String nom = scanner.nextLine();
+        String nom = scanner.nextLine().trim();
+
+        if (!stock.getNomsIngredients().contains(nom)) {
+            System.out.println("Ingrédient inconnu, impossible d'ajouter.");
+            return;
+        }
 
         System.out.print("Quantité à ajouter: ");
         try {
@@ -268,6 +281,7 @@ public class AppRestaurant {
 
                 if (bd.connecter()) {
                     bd.mettreAJourIngredient(nom, stock.getQuantitesIngredients().get(stock.getNomsIngredients().indexOf(nom)));
+                    bd.deconnecter();
                 }
             } else {
                 System.out.println("La quantité doit être positive!");
@@ -276,6 +290,7 @@ public class AppRestaurant {
             System.out.println("Veuillez entrer un nombre valide.");
         }
     }
+
 
     private static void afficherEmployes() {
         System.out.println("\n----- Liste des employés -----");
