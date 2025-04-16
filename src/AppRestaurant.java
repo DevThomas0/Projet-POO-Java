@@ -66,9 +66,10 @@ public class AppRestaurant {
         menu.ajouterP(coca);
         
         stock.ajouterIngredient("Farine", 1000);
-        stock.ajouterIngredient("Tomate", 500);
+        stock.ajouterIngredient("Tomate", 0);
+        bd.mettreAJourIngredient("Tomate", 0);
         stock.ajouterIngredient("Mozzarella", 300);
-        stock.ajouterIngredient("Œufs", 50);
+        stock.ajouterIngredient("Oeufs", 50);
         stock.ajouterIngredient("Pancetta", 200);
         stock.ajouterIngredient("Parmesan", 250);
         stock.ajouterIngredient("Mascarpone", 300);
@@ -91,12 +92,14 @@ public class AppRestaurant {
         ingredientsTiramisu.add("Mascarpone");
         ingredientsTiramisu.add("Café");
         ingredientsTiramisu.add("Cacao");
-        ingredientsTiramisu.add("Œufs");
+        ingredientsTiramisu.add("Oeufs");
         
         stock.definirRecette(margherita.getNom(), ingredientsMargherita);
         stock.definirRecette(carbonara.getNom(), ingredientsCarbonara);
         stock.definirRecette(tiramisu.getNom(), ingredientsTiramisu);
-        
+
+        stock.definirRecette("Coca-Cola", new ArrayList<>());
+
         employes.add(new Serveur("Dupont", "Jean"));
         employes.add(new Cuisinier("Martin", "Sophie", stock));
         employes.add(new Gerant("Dubois", "Pierre", stock));
@@ -206,6 +209,15 @@ public class AppRestaurant {
                             System.out.println("Plat ajouté à la commande!");
 
                             stock.miseAJourStock(plat);
+
+                            if (bd.connecter()) {
+                                for (String nomIng : stock.getNomsIngredients()) {
+                                    int qte = stock.getQuantitesIngredients().get(stock.indexOf(nomIng));
+                                    bd.mettreAJourIngredient(nomIng, qte);
+                                }
+                                bd.deconnecter();
+                            }
+
                         } else {
                             System.out.println("Désolé, les ingrédients pour ce plat ne sont pas disponibles.");
                         }
@@ -220,7 +232,7 @@ public class AppRestaurant {
 
         commande.afficherCommande();
         commande.setId((int) (Math.random() * 10000));
-         if (bd.connecter()) {
+        if (bd.connecter()) {
             bd.sauvegarderCommande(commande);
             bd.deconnecter();
             System.out.println("Commande sauvegardée avec succès!");
@@ -228,6 +240,7 @@ public class AppRestaurant {
             System.out.println("Impossible de sauvegarder la commande dans la base de données!");
         }
     }
+
 
     private static void afficherCommandes() {
         if (bd.connecter()) {
