@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ConnexionBD {
-    private static final String URL = "jdbc:mysql://localhost:33065/restaurantbella";
+    private static final String URL = "jdbc:mysql://localhost:3307/restaurantbella";
     private static final String USER = "root";
     private static final String PASSWORD = "root";
 
@@ -41,7 +41,7 @@ public class ConnexionBD {
     public void creerTables() {
         try {
             Statement stmt = connexion.createStatement();
-            
+
             stmt.execute("CREATE TABLE IF NOT EXISTS plats (" +
                     "id INT AUTO_INCREMENT PRIMARY KEY, " +
                     "nom VARCHAR(100) UNIQUE NOT NULL, " +
@@ -107,15 +107,15 @@ public class ConnexionBD {
         try {
             Statement stmt = connexion.createStatement();
             ResultSet rs = stmt.executeQuery(requete);
-            
+
             while (rs.next()) {
                 String nom = rs.getString("nom");
                 double prix = rs.getDouble("prix");
                 String type = rs.getString("type");
-                
+
                 plats.add(new Plat(nom, prix, type));
             }
-            
+
             rs.close();
             stmt.close();
         } catch (SQLException e) {
@@ -155,14 +155,14 @@ public class ConnexionBD {
         try {
             Statement stmt = connexion.createStatement();
             ResultSet rs = stmt.executeQuery(requete);
-            
+
             while (rs.next()) {
                 String nom = rs.getString("nom");
                 int quantite = rs.getInt("quantite");
-                
+
                 stock.ajouterIngredient(nom, quantite);
             }
-            
+
             rs.close();
             stmt.close();
         } catch (SQLException e) {
@@ -190,11 +190,11 @@ public class ConnexionBD {
             PreparedStatement pstmt = connexion.prepareStatement(requete);
             pstmt.setString(1, nomPlat);
             ResultSet rs = pstmt.executeQuery();
-            
+
             while (rs.next()) {
                 ingredients.add(rs.getString("ingredient_nom"));
             }
-            
+
             rs.close();
             pstmt.close();
         } catch (SQLException e) {
@@ -223,12 +223,12 @@ public class ConnexionBD {
         try {
             Statement stmt = connexion.createStatement();
             ResultSet rs = stmt.executeQuery(requete);
-            
+
             while (rs.next()) {
                 String nom = rs.getString("nom");
                 String prenom = rs.getString("prenom");
                 String poste = rs.getString("poste");
-                
+
                 if (poste.equals("Serveur")) {
                     employes.add(new Serveur(nom, prenom));
                 } else if (poste.equals("Cuisinier")) {
@@ -237,7 +237,7 @@ public class ConnexionBD {
                     employes.add(new Gerant(nom, prenom, stock));
                 }
             }
-            
+
             rs.close();
             stmt.close();
         } catch (SQLException e) {
@@ -245,4 +245,49 @@ public class ConnexionBD {
         }
         return employes;
     }
+
+        public void sauvegarderCommande (Commande commande){
+            if (connexion == null) {
+                System.out.println("Pas de connexion à la base de données.");
+                return;
+            }
+
+            String requete = "INSERT INTO commandes (id, statut) VALUES (?, ?)";
+
+            try (PreparedStatement pstmt = connexion.prepareStatement(requete)) {
+                pstmt.setInt(1, commande.getId());
+                pstmt.setString(2, commande.getEtat());
+
+                pstmt.executeUpdate();
+                System.out.println("Commande sauvegardée avec succès !");
+            } catch (SQLException e) {
+                System.out.println("Erreur lors de la sauvegarde de la commande : " + e.getMessage());
+            }
+        }
+
+    public List<Commande> chargerCommandes() {
+        List<Commande> commandes = new ArrayList<>();
+
+        if (connexion == null) {
+            System.out.println("Pas de connexion à la base.");
+            return commandes;
+        }
+
+        String requete = "SELECT * FROM commandes";
+
+        try (Statement stmt = connexion.createStatement(); ResultSet rs = stmt.executeQuery(requete)) {
+            while (rs.next()) {
+                Commande c = new Commande();
+                c.setId(rs.getInt("id"));
+                c.setEtat(rs.getString("statut"));
+                commandes.add(c);
+            }
+        } catch (SQLException e) {
+            System.out.println("Erreur lors du chargement des commandes : " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return commandes;
+    }
+
 }

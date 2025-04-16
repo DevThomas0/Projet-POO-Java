@@ -13,14 +13,6 @@ public class Commande {
         this.etat = "En attente";
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public void ajoutePlat(Plat plat) {
         if (nbPlats < capaciteMax) {
             plats[nbPlats] = plat;
@@ -94,6 +86,14 @@ public class Commande {
             System.out.printf("Total: %.2f €%n", calculTot());
             System.out.println("État: " + etat);
         }
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public Plat[] getPlats() {

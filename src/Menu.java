@@ -31,4 +31,14 @@ public class Menu {
         }
         return null;
     }
+
+    public Plat rechercherPlat(String nom) {
+        for (Plat plat : plats) {
+            if (plat.getNom().equalsIgnoreCase(nom)) {
+                return plat;
+            }
+        }
+        return null;
+    }
+
 }

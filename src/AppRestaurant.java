@@ -16,42 +16,43 @@ public class AppRestaurant {
         stock = new Stock();
         menu = new Menu();
         employes = new ArrayList<>();
-        
+
         if (bd.connecter()) {
             System.out.println("Connexion à la base de données réussie!");
-            
+
             bd.creerTables();
-            
+
             List<Plat> platsCharges = bd.chargerPlats();
             for (int i = 0; i < platsCharges.size(); i++) {
                 menu.ajouterP(platsCharges.get(i));
             }
-            
+
             bd.chargerIngredients(stock);
-            
+
             for (int i = 0; i < menu.getPlats().size(); i++) {
                 Plat plat = menu.getPlats().get(i);
                 List<String> ingredients = bd.chargerIngredientsRecette(plat.getNom());
                 stock.definirRecette(plat.getNom(), ingredients);
             }
-            
+
             employes = bd.chargerEmployes(stock);
-            
+
             if (menu.getPlats().isEmpty()) {
                 initialiserDonnees();
             }
-            
+
             menuInteractif();
-            
+
             bd.deconnecter();
+
         } else {
             System.out.println("Impossible de se connecter à la base de données!");
-            
             initialiserDonnees();
             menuInteractif();
         }
     }
-    
+
+
     private static void initialiserDonnees() {
 
         Plat margherita = new Plat("Margherita", 8.50, "Pizza");
@@ -85,7 +86,7 @@ public class AppRestaurant {
         ingredientsCarbonara.add("Oeufs");
         ingredientsCarbonara.add("Pancetta");
         ingredientsCarbonara.add("Parmesan");
-        
+
         List<String> ingredientsTiramisu = new ArrayList<>();
         ingredientsTiramisu.add("Mascarpone");
         ingredientsTiramisu.add("Café");
@@ -143,7 +144,8 @@ public class AppRestaurant {
             System.out.println("3. Afficher l'état du stock");
             System.out.println("4. Ajouter des ingrédients au stock");
             System.out.println("5. Afficher les employés");
-            System.out.println("6. Quitter");
+            System.out.println("6. Ouvrir interface graphique");
+            System.out.println("7. Quitter");
             System.out.print("Votre choix: ");
             
             try {
@@ -170,36 +172,39 @@ public class AppRestaurant {
                     afficherEmployes();
                     break;
                 case 6:
-                    System.out.println("Merci d'avoir utilisé l'application!");
+                    new InterfaceGraphique(menu, stock, bd);
+                    break;
+                case 7:
+                    System.out.println("Merci !");
                     break;
                 default:
                     System.out.println("Choix invalide!");
             }
-        } while (choix != 6);
+        } while (choix != 7);
     }
-    
+
     private static void creerCommande() {
         Commande commande = new Commande();
         boolean commander = true;
-        
+
         while (commander) {
             menu.montreM();
             System.out.println("\n0. Terminer la commande");
             System.out.print("Entrez le numéro du plat à ajouter (0 pour terminer): ");
-            
+
             try {
                 int choixPlat = Integer.parseInt(scanner.nextLine());
-                
+
                 if (choixPlat == 0) {
                     commander = false;
                 } else {
                     Plat plat = menu.platParIdx(choixPlat);
-                    
+
                     if (plat != null) {
                         if (stock.verifierDisponibilite(plat)) {
                             commande.ajoutePlat(plat);
                             System.out.println("Plat ajouté à la commande!");
-                            
+
                             stock.miseAJourStock(plat);
                         } else {
                             System.out.println("Désolé, les ingrédients pour ce plat ne sont pas disponibles.");
@@ -212,9 +217,9 @@ public class AppRestaurant {
                 System.out.println("Veuillez entrer un nombre valide.");
             }
         }
-        
-        commande.afficherCommande();
 
+        commande.afficherCommande();
+        commande.setId((int) (Math.random() * 10000));
          if (bd.connecter()) {
             bd.sauvegarderCommande(commande);
             bd.deconnecter();
@@ -223,19 +228,31 @@ public class AppRestaurant {
             System.out.println("Impossible de sauvegarder la commande dans la base de données!");
         }
     }
-    
+
+    private static void afficherCommandes() {
+        if (bd.connecter()) {
+            List<Commande> commandes = bd.chargerCommandes();
+            for (Commande c : commandes) {
+                c.afficherCommande();
+            }
+            bd.deconnecter();
+        } else {
+            System.out.println("Impossible de se connecter à la base de données.");
+        }
+    }
+
     private static void ajouterIngredients() {
         System.out.println("\n----- Ajout d'ingrédients au stock -----");
         System.out.print("Nom de l'ingrédient: ");
         String nom = scanner.nextLine();
-        
+
         System.out.print("Quantité à ajouter: ");
         try {
             int quantite = Integer.parseInt(scanner.nextLine());
             if (quantite > 0) {
                 stock.ajouterIngredient(nom, quantite);
                 System.out.println(quantite + " unités de " + nom + " ajoutées au stock.");
-                
+
                 if (bd.connecter()) {
                     bd.mettreAJourIngredient(nom, stock.getQuantitesIngredients().get(stock.getNomsIngredients().indexOf(nom)));
                 }
@@ -246,7 +263,7 @@ public class AppRestaurant {
             System.out.println("Veuillez entrer un nombre valide.");
         }
     }
-    
+
     private static void afficherEmployes() {
         System.out.println("\n----- Liste des employés -----");
         for (int i = 0; i < employes.size(); i++) {
